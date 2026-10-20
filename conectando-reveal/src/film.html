@@ -494,13 +494,13 @@
 
         // ================================================================== 01 ICONOGRAFÍA (bars 4-7)
         const ARCHES = [
-          ["bust", C.blue, "BUSTO"],
-          ["helmet", C.sand, "CASCO"],
-          ["horse", C.terra, "CABALLO"],
-          ["palmette", C.grey, "PALMETA"],
-          ["cup", C.sand, "COPA"],
-          ["venus", C.blue, "VENUS"],
-          ["fan", C.grey, "ABANICO"],
+          ["bust", C.blue],
+          ["helmet", C.sand],
+          ["horse", C.terra],
+          ["palmette", C.grey],
+          ["cup", C.sand],
+          ["venus", C.blue],
+          ["fan", C.grey],
         ];
         const aw = (P ? 0.4 : 0.17) * W;
         const ah = (P ? 0.36 : 0.5) * H;
@@ -523,19 +523,13 @@
         NUDGES.forEach(([t, n]) => {
           for (let k = 0; k < n && shown < ARCHES.length; k++, shown++) revealAt[shown] = t + 0.15 + k * E8;
         });
-        const archEls = ARCHES.map(([name, col, lab], i) => {
+        const archEls = ARCHES.map(([name, col], i) => {
           const x = ax0 + i * (aw + ag);
           const a = place(el("div", "arch", track, { background: col, borderRadius: `${aw / 2}px ${aw / 2}px 0 0` }), x, ay, aw, ah);
           const m = motif(name, a, aw / 2, ah * 0.56, aw * 0.6, ah * 0.52);
-          const L = el("div", "label", track);
-          L.style.left = px(x);
-          L.style.top = px(ay + ah + 0.03 * H);
-          const lw = el("span", "w", L);
-          lw.textContent = lab;
           const t = revealAt[i];
           archRise(a, aw, t);
           tl.fromTo(m, { yPercent: 40, scale: 0.7 }, { yPercent: 0, scale: 1, duration: 0.9, ease: "expo.out" }, t + 0.12);
-          rise(lw, t + 0.18, 0.6);
           return { a, m, x };
         });
         // the track slides on the nudge curve (slow-fast-slow) to bring the next arches in
@@ -722,6 +716,9 @@
         const PB = [(W - pwW) / 2, (H - pwH) / 2, pwW, pwH];
         const pr = place(el("div", "box", photo, { boxShadow: "0 50px 100px rgba(0,0,0,0.3)", borderRadius: P ? "0px" : "18px" }), ...PB);
         const prImg = img("assets/img/printer-greek.jpg", pr, 1418, 987, PB[2], PB[3], 0.5, 0.5, 1.02);
+        // hidden until it opens: its collapsed clip would otherwise sit as a speck mid-frame
+        gsap.set(pr, { opacity: 0 });
+        tl.set(pr, { opacity: 1 }, T(14, 2) - 0.12);
         tl.fromTo(pr, { clipPath: "inset(48% 48% 48% 48% round 18px)" }, { clipPath: "inset(0% 0% 0% 0% round 18px)", duration: 0.9, ease: "expo.out", immediateRender: true }, T(14, 2) - 0.12);
         tl.fromTo(prImg, { scale: 1.08 }, { scale: 1, duration: 1.4, ease: "expo.out" }, T(14, 2) - 0.12);
         // bars 15-16: photos arrive in slats, one every two beats

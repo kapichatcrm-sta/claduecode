@@ -19,7 +19,7 @@ Tiene un arco de dinámica de −24 dB en la intro a −14 dB en el drop B y el 
 | 0–4 | 1–2 | **Intro** (gris azulado) | Las letras del logo aparecen una por corchea, muy separadas, y el tracking se cierra mientras el pad abre el filtro. En c2 t2 el script "design and home" se escribe solo |
 | 4 | 3 | **Drop** | Bombo y crash: el logo se bloquea con un pulso y los siete motivos estallan alrededor, uno por semicorchea |
 | 5,3–6 | 3 t3–4 | → | **FLIP**: el logo vuela a la cabecera tipo revista, que acompaña todo el video, mientras la primera página empuja |
-| 6–14 | 4–7 | **01 — Iconografía** | Ventanas en arco (azul, arena, terracota, gris) con un motivo cada una, una por beat; la fila avanza con curva lenta-rápida-lenta para mostrar los siete |
+| 6–14 | 4–7 | **01 — Iconografía** | Ventanas en arco (azul, arena, terracota, gris) con un motivo cada una (sin nombres), una por beat; la fila avanza con curva lenta-rápida-lenta para mostrar los siete |
 | 13–14 | 7 t3–4 | → | **Transición de arco**: el arco azul de la Venus se abre hasta llenar el cuadro |
 | 14–20 | 8–10 | **02 — Paleta** | El azul se pliega en la primera columna y suben las otras cuatro, una por beat, con su hex; en c9 t2 la columnata se pliega en el bloque de la página 13 |
 | 20 | 11 | → | Empuje de página |
