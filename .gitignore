@@ -3,3 +3,6 @@ helen-brand-reveal/assets/audio/
 helen-brand-reveal/renders/
 node_modules/
 *-entrega.zip
+*/assets/audio/
+*/renders/
+__pycache__/

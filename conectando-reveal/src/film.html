@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="es" data-resolution="@@RES@@">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=@@W@@, height=@@H@@" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "MovesCabse";
+        src: url("assets/fonts/MovesCabse.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+      :root {
+        --blue: #afc6cc;
+        --terra: #b06544;
+        --sand: #e3c099;
+        --grey: #bcc3c5;
+        --cream: #f5edda;
+        --navy: #3e5b79;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: @@W@@px;
+        height: @@H@@px;
+        overflow: hidden;
+        background: #bcc3c5;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--grey);
+        container-type: size;
+        font-family: "MovesCabse", Georgia, serif;
+        color: var(--navy);
+      }
+      .scene,
+      .fill {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .scene {
+        overflow: hidden;
+      }
+      .abs {
+        position: absolute;
+      }
+      .logo {
+        position: absolute;
+      }
+      .lg-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .mk {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding: 0.08em 0.1em 0.14em;
+        margin: -0.08em -0.1em -0.14em;
+      }
+      .w {
+        display: inline-block;
+      }
+      .caps {
+        letter-spacing: 0.32em;
+        white-space: nowrap;
+      }
+      .arch {
+        position: absolute;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(62, 91, 121, 0.14);
+      }
+      .arch img,
+      .box img {
+        position: absolute;
+        display: block;
+      }
+      .box {
+        position: absolute;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(62, 91, 121, 0.14);
+      }
+      .motif {
+        position: absolute;
+        display: block;
+      }
+      .label {
+        position: absolute;
+        font-size: 1.55cqh;
+        letter-spacing: 0.38em;
+        white-space: nowrap;
+        color: var(--navy);
+      }
+      #s-intro {
+        background: transparent;
+      }
+      #in-push {
+        background: var(--grey);
+      }
+      /* pushed scenes paint their ground on the moving wrapper, never on the clip */
+      #s-icons,
+      #s-apps,
+      #s-type {
+        background: transparent;
+      }
+      #ic-push,
+      #ap-push {
+        background: var(--cream);
+      }
+      #ty-push {
+        background: var(--blue);
+      }
+      #s-palette {
+        background: transparent;
+      }
+      #pa-arch {
+        background: var(--cream);
+      }
+      #s-patterns {
+        background: transparent;
+      }
+      #pt-arch {
+        background: var(--cream);
+      }
+      #s-close {
+        background: transparent;
+      }
+      #cl-arch {
+        background: var(--terra);
+      }
+      .band {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .tile {
+        position: absolute;
+        background-image: url("assets/brand/pattern-vases-tile.png");
+        background-repeat: repeat;
+      }
+      .sw {
+        position: absolute;
+        inset: 0;
+        box-shadow: 0 30px 60px rgba(62, 91, 121, 0.16);
+      }
+      .hex {
+        position: absolute;
+        font-size: 1.9cqh;
+        letter-spacing: 0.34em;
+        white-space: nowrap;
+        color: var(--navy);
+      }
+      .aa {
+        position: absolute;
+        font-size: 34cqh;
+        line-height: 1;
+        color: var(--terra);
+      }
+      .specimen {
+        position: absolute;
+        color: var(--terra);
+        font-size: 3.7cqh;
+        line-height: 1.25;
+        white-space: nowrap;
+      }
+      .caption {
+        position: absolute;
+        font-size: 3.6cqh;
+        letter-spacing: 0.3em;
+        white-space: nowrap;
+        color: var(--navy);
+      }
+      #mh-rule {
+        position: absolute;
+        height: 1px;
+        background: var(--navy);
+        opacity: 0.35;
+        transform-origin: 0% 50%;
+      }
+      #mh-chapter {
+        position: absolute;
+        text-align: right;
+      }
+      #mh-chapter .ch {
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 1.6cqh;
+        letter-spacing: 0.38em;
+        white-space: nowrap;
+      }
+      #cl-rule {
+        position: absolute;
+        height: 2px;
+        background: var(--cream);
+        transform-origin: 50% 50%;
+      }
+      #root.portrait .label {
+        font-size: 1.05cqh;
+      }
+      #root.portrait .hex {
+        font-size: 1.2cqh;
+        letter-spacing: 0.22em;
+      }
+      #root.portrait .aa {
+        font-size: 19cqh;
+      }
+      #root.portrait .specimen {
+        font-size: 2.3cqh;
+      }
+      #root.portrait .caption {
+        font-size: 2.1cqh;
+      }
+      #root.portrait #mh-chapter .ch {
+        font-size: 1.05cqh;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      class="@@ORIENT@@"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="@@END@@"
+      data-width="@@W@@"
+      data-height="@@H@@"
+    >
+      <audio id="bgm" src="assets/bgm.mp3" data-start="0" data-duration="@@END@@" data-track-index="11" data-volume="1"></audio>
+      @@LOGO_DEFS@@
+
+      <!-- 00 · INTRO: tracking converges, script writes itself, motifs burst on the drop -->
+      <div id="s-intro" class="scene clip" data-start="@@INTRO_START@@" data-duration="@@INTRO_DUR@@" data-track-index="1">
+        <div id="in-push" class="fill"><div id="in-cam" class="fill"><div id="in-motifs" class="fill"></div></div></div>
+        @@LOGO_INTRO@@
+      </div>
+
+      <!-- 01 · ICONOGRAFÍA: arch windows on a sliding track -->
+      <div id="s-icons" class="scene clip" data-start="@@ICONS_START@@" data-duration="@@ICONS_DUR@@" data-track-index="2">
+        <div id="ic-push" class="fill"><div id="ic-track" class="fill"></div></div>
+      </div>
+
+      <!-- 02 · PALETA: an arch opens into the colonnade, which folds into the manual's block -->
+      <div id="s-palette" class="scene clip" data-start="@@PALETTE_START@@" data-duration="@@PALETTE_DUR@@" data-track-index="3">
+        <div id="pa-push" class="fill"><div id="pa-arch" class="fill"><div id="pa-cam" class="fill"></div></div></div>
+      </div>
+
+      <!-- 03 · TIPOGRAFÍA (the break) -->
+      <div id="s-type" class="scene clip" data-start="@@TYPE_START@@" data-duration="@@TYPE_DUR@@" data-track-index="4">
+        <div id="ty-push" class="fill">
+          <div id="ty-left" class="abs" style="background: var(--blue)"></div>
+          <div id="ty-right" class="abs" style="background: var(--terra)"></div>
+          <div class="aa" id="ty-aa"><span class="w">Aa</span></div>
+          <div id="ty-rule" class="abs" style="height: 2px; background: var(--terra); transform-origin: 0% 50%"></div>
+          <div class="label" id="ty-l1" style="color: var(--terra)"><span class="w">MOVESCABSE</span></div>
+          <div class="specimen caps" id="ty-s1" style="letter-spacing: 0.22em"><span class="w">ABCDEFGHIJ</span></div>
+          <div class="specimen caps" id="ty-s2" style="letter-spacing: 0.22em"><span class="w">KLMNÑOPQRSTUVWXYZ</span></div>
+          <div class="label" id="ty-l2" style="color: var(--blue)"><span class="w">QUENTIN</span></div>
+          <div id="ty-q" class="abs">@@LOGO_TYPE@@</div>
+        </div>
+      </div>
+
+      <!-- 04 · PATRONES (the drop) -->
+      <div id="s-patterns" class="scene clip" data-start="@@PATTERNS_START@@" data-duration="@@PATTERNS_DUR@@" data-track-index="5">
+        <div id="pt-push" class="fill"><div id="pt-arch" class="fill"><div id="pt-bands" class="fill"></div><div id="pt-photo" class="fill"></div></div></div>
+      </div>
+
+      <!-- 05 · APLICACIONES: editorial spreads -->
+      <div id="s-apps" class="scene clip" data-start="@@APPS_START@@" data-duration="@@APPS_DUR@@" data-track-index="6">
+        <div id="ap-push" class="fill"></div>
+      </div>
+
+      <!-- masthead: the logo lives here between the intro and the closing -->
+      <div id="mast" class="scene clip" data-start="@@MAST_START@@" data-duration="@@MAST_DUR@@" data-track-index="7" style="pointer-events: none">
+        <div id="mh-fade" class="fill">
+          @@LOGO_MAST@@
+          <div id="mh-rule"></div>
+          <div id="mh-chapter"></div>
+        </div>
+      </div>
+
+      <!-- 06 · CIERRE -->
+      <div id="s-close" class="scene clip" data-start="@@CLOSE_START@@" data-duration="@@CLOSE_DUR@@" data-track-index="8">
+        <div id="cl-arch" class="fill">
+          <div id="cl-cam" class="fill">
+            @@LOGO_CLOSE@@
+            <div id="cl-rule"></div>
+            <div id="cl-motifs" class="fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const W = @@W@@;
+        const H = @@H@@;
+        const P = H > W;
+        const BEAT = 0.5;
+        const E8 = BEAT / 2;
+        const E16 = BEAT / 4;
+        // 120 BPM grid: bar is 1-based, beat 0-based (all values land on the 30 fps grid)
+        const T = (bar, beat = 0) => ((bar - 1) * 4 + beat) * BEAT;
+        const $ = (s, r = document) => r.querySelector(s);
+        const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+        const tl = gsap.timeline({ paused: true });
+        const C = { blue: "#AFC6CC", terra: "#B06544", sand: "#E3C099", grey: "#BCC3C5", cream: "#F5EDDA", navy: "#3E5B79" };
+        const LOGO_AR = 58 / 274;
+        const LU = 274; // logo viewBox width in units
+
+        // ------------------------------------------------------------------ helpers
+        function el(tag, cls, parent, style) {
+          const e = document.createElement(tag);
+          if (cls) e.className = cls;
+          if (style) Object.assign(e.style, style);
+          if (parent) parent.appendChild(e);
+          return e;
+        }
+        const px = (v) => v + "px";
+        function place(e, x, y, w, h) {
+          Object.assign(e.style, { left: px(x), top: px(y), width: px(w), height: px(h) });
+          return e;
+        }
+        function img(src, parent, iw, ih, bw, bh, fx = 0.5, fy = 0.5, over = 1.04) {
+          const s = Math.max(bw / iw, bh / ih) * over;
+          const w = iw * s;
+          const h = ih * s;
+          const i = el("img", "", parent);
+          i.src = src;
+          i.alt = "";
+          i.setAttribute("data-layout-allow-overflow", "");
+          const left = Math.min(0, Math.max(bw - w, bw / 2 - fx * w));
+          const top = Math.min(0, Math.max(bh - h, bh / 2 - fy * h));
+          Object.assign(i.style, { width: px(w), height: px(h), left: px(left), top: px(top) });
+          return i;
+        }
+        function mask(e) {
+          const m = document.createElement("span");
+          m.className = "mk";
+          e.parentNode.insertBefore(m, e);
+          m.appendChild(e);
+          return e;
+        }
+        // words rise out of their own line mask
+        function rise(e, t, dur = 0.7) {
+          mask(e);
+          gsap.set(e, { yPercent: 118 });
+          tl.to(e, { yPercent: 0, duration: dur, ease: "expo.out" }, t);
+        }
+        function riseOut(e, t, dur = 0.45) {
+          tl.to(e, { yPercent: -118, duration: dur, ease: "expo.in" }, t);
+        }
+        // arch geometry as a clip-path inset (round top corners = half the width)
+        function archInset(x, y, w, h, r = w / 2) {
+          return `inset(${(y / H) * 100}% ${((W - x - w) / W) * 100}% ${((H - y - h) / H) * 100}% ${(x / W) * 100}% round ${r}px ${r}px 0px 0px)`;
+        }
+        const FULL = "inset(0% 0% 0% 0% round 0px 0px 0px 0px)";
+        // an arch window rising out of its baseline
+        function archRise(e, w, t, dur = 0.8) {
+          const r = `${w / 2}px ${w / 2}px 0px 0px`;
+          tl.fromTo(e, { clipPath: `inset(100% 0% 0% 0% round ${r})` }, { clipPath: `inset(0% 0% 0% 0% round ${r})`, duration: dur, ease: "expo.out", immediateRender: true }, t);
+        }
+        // page push: both pages travel left together, fastest on the beat
+        function push(outSel, inSel, t, d = 0.8) {
+          tl.fromTo(outSel, { x: 0 }, { x: -W, duration: d, ease: "expo.inOut", immediateRender: false }, t - d / 2);
+          tl.fromTo(inSel, { x: W }, { x: 0, duration: d, ease: "expo.inOut" }, t - d / 2);
+        }
+        // slat transition: the next photo arrives in horizontal strips, staggered, on the beat
+        function slats(parent, src, iw, ih, box, t, fx, fy, n = 6) {
+          const [bx, by, bw, bh] = box;
+          const sh = bh / n;
+          for (let k = 0; k < n; k++) {
+            const s = place(el("div", "box", parent, { boxShadow: "none" }), bx, by + k * sh, bw, sh + 1);
+            const i = img(src, s, iw, ih, bw, bh, fx, fy, 1.06);
+            i.style.top = px(parseFloat(i.style.top) - k * sh);
+            tl.fromTo(s, { x: bw + W * 0.05 }, { x: 0, duration: 0.62, ease: "expo.inOut" }, t - 0.31 + k * 0.035);
+            tl.fromTo(i, { x: -bw * 0.18 }, { x: 0, duration: 0.9, ease: "expo.out" }, t - 0.05 + k * 0.035);
+          }
+        }
+        function logoGeom(id, w, cx, cy) {
+          const e = $("#" + id);
+          place(e, cx - w / 2, cy - (w * LOGO_AR) / 2, w, w * LOGO_AR);
+          return e;
+        }
+        const ICON = {
+          bust: [64, 108],
+          helmet: [85, 94],
+          horse: [78, 63],
+          palmette: [77, 101],
+          cup: [102, 61],
+          venus: [51, 113],
+          fan: [58, 60],
+        };
+        function motif(name, parent, cx, cy, maxW, maxH) {
+          const [iw, ih] = ICON[name];
+          const s = Math.min(maxW / iw, maxH / ih);
+          const m = el("img", "motif", parent);
+          m.src = `assets/icons/${name}.svg`;
+          m.alt = "";
+          place(m, cx - (iw * s) / 2, cy - (ih * s) / 2, iw * s, ih * s);
+          return m;
+        }
+
+        // ================================================================== 00 INTRO (bars 1-3)
+        const LW = (P ? 0.86 : 0.62) * W;
+        const lk = LW / LU;
+        logoGeom("lg", LW, W / 2, H / 2);
+        const caps = $$(".lg-cap");
+        const spread = (P ? 0.05 : 0.055) * W;
+        caps.forEach((c, i) => {
+          const off = ((i - 7.5) * spread) / lk;
+          gsap.set(c, { opacity: 0, x: off });
+          tl.to(c, { opacity: 1, duration: 0.7, ease: "power2.out" }, 0.05 + i * 0.2);
+          // tracking closes up across the intro and locks on the drop (bar 3)
+          tl.to(c, { x: 0, duration: T(3) - 0.05, ease: "power3.inOut" }, 0.05);
+        });
+        tl.fromTo("#lg-script", { clipPath: "inset(-20% 100% -20% 0%)" }, { clipPath: "inset(-20% 0% -20% 0%)", duration: T(3) - T(2, 1), ease: "power1.inOut" }, T(2, 1));
+        // the drop: the seven motifs burst around the logo on the 16ths
+        const BURST = ["palmette", "helmet", "horse", "cup", "venus", "bust", "fan"];
+        const inMotifs = $("#in-motifs");
+        BURST.forEach((name, i) => {
+          const a = -Math.PI / 2 + (i / BURST.length) * Math.PI * 2 + 0.35;
+          const cx = W / 2 + Math.cos(a) * (P ? 0.36 : 0.38) * W;
+          const cy = H / 2 + Math.sin(a) * (P ? 0.3 : 0.36) * H;
+          const m = motif(name, inMotifs, cx, cy, (P ? 0.18 : 0.08) * W, (P ? 0.09 : 0.15) * H);
+          gsap.set(m, { scale: 0, rotation: i % 2 ? -12 : 12 });
+          tl.to(m, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.5)" }, T(3) + i * E16);
+          tl.to(m, { x: (cx - W / 2) * 0.08, y: (cy - H / 2) * 0.08, duration: 1.2, ease: "none" }, T(3) + 0.3);
+          tl.to(m, { scale: 0, duration: 0.4, ease: "expo.in" }, T(3, 3) + i * 0.03);
+        });
+        tl.fromTo("#lg", { scale: 1 }, { scale: 1.035, duration: 0.12, ease: "power2.out", immediateRender: false }, T(3));
+        tl.to("#lg", { scale: 1, duration: 0.6, ease: "expo.out" }, T(3) + 0.12);
+        // FLIP: the logo flies into the masthead as the first page pushes in
+        const MH = P ? { x: 0.06 * W, y: 0.04 * H, w: 0.4 * W } : { x: 0.035 * W, y: 0.045 * H, w: 0.15 * W };
+        const mhS = MH.w / LW;
+        const mhCx = MH.x + MH.w / 2;
+        const mhCy = MH.y + (MH.w * LOGO_AR) / 2;
+        push("#in-push", "#ic-push", T(4));
+
+        // ================================================================== masthead
+        logoGeom("mh", MH.w, mhCx, mhCy);
+        // FLIP: the masthead logo takes over from the intro logo at full size and flies home,
+        // on the masthead layer so the incoming page never covers it
+        const flyT = T(4) - 0.7;
+        gsap.set("#mh", { opacity: 0 });
+        tl.set("#mh", { opacity: 1, x: W / 2 - mhCx, y: H / 2 - mhCy, scale: 1 / mhS }, flyT);
+        tl.set("#lg", { opacity: 0 }, flyT);
+        tl.to("#mh", { x: 0, y: 0, scale: 1, duration: 0.7, ease: "expo.inOut" }, flyT);
+        const ruleY = MH.y + MH.w * LOGO_AR + (P ? 0.012 : 0.025) * H;
+        place($("#mh-rule"), MH.x, ruleY, W - 2 * MH.x, 1);
+        tl.fromTo("#mh-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: "expo.inOut" }, T(4) - 0.2);
+        const chBox = place($("#mh-chapter"), W / 2, mhCy - 0.012 * H, W / 2 - MH.x, 0.04 * H);
+        const CHAPTERS = [
+          ["01 — ICONOGRAFÍA", T(4)],
+          ["02 — PALETA", T(8)],
+          ["03 — TIPOGRAFÍA", T(11)],
+          ["05 — APLICACIONES", T(17)],
+        ];
+        CHAPTERS.forEach(([txt, t], i) => {
+          const d = el("div", "ch", chBox);
+          // in 16:9 the typography chapter label sits over the terracotta panel: cream reads there
+          if (txt.startsWith("03") && !P) d.style.color = C.cream;
+          const w = el("span", "w", d);
+          w.textContent = txt;
+          rise(w, t + 0.1, 0.7);
+          if (i < CHAPTERS.length - 1) riseOut(w, CHAPTERS[i + 1][1] - 0.35);
+        });
+        // the masthead steps aside for the full-bleed patterns, and for the closing
+        tl.to("#mh-fade", { opacity: 0, duration: 0.3, ease: "power2.in" }, T(13) - 0.35);
+        tl.to("#mh-fade", { opacity: 1, duration: 0.4, ease: "power2.out" }, T(17) + 0.1);
+
+        // ================================================================== 01 ICONOGRAFÍA (bars 4-7)
+        const ARCHES = [
+          ["bust", C.blue, "BUSTO"],
+          ["helmet", C.sand, "CASCO"],
+          ["horse", C.terra, "CABALLO"],
+          ["palmette", C.grey, "PALMETA"],
+          ["cup", C.sand, "COPA"],
+          ["venus", C.blue, "VENUS"],
+          ["fan", C.grey, "ABANICO"],
+        ];
+        const aw = (P ? 0.4 : 0.17) * W;
+        const ah = (P ? 0.36 : 0.5) * H;
+        const ag = (P ? 0.05 : 0.03) * W;
+        const vis = P ? 2 : 4;
+        const ax0 = (W - (vis * aw + (vis - 1) * ag)) / 2;
+        const ay = (P ? 0.27 : 0.25) * H;
+        const track = $("#ic-track");
+        // when each arch first comes into view (landscape: 4 then 3; portrait: 2, 2, 2, 1)
+        const NUDGES = P
+          ? [
+              [T(5), 2],
+              [T(6), 2],
+              [T(6, 2), 1],
+            ]
+          : [[T(6), 3]];
+        const revealAt = [];
+        let shown = vis;
+        for (let i = 0; i < vis; i++) revealAt[i] = T(4, 1 + i);
+        NUDGES.forEach(([t, n]) => {
+          for (let k = 0; k < n && shown < ARCHES.length; k++, shown++) revealAt[shown] = t + 0.15 + k * E8;
+        });
+        const archEls = ARCHES.map(([name, col, lab], i) => {
+          const x = ax0 + i * (aw + ag);
+          const a = place(el("div", "arch", track, { background: col, borderRadius: `${aw / 2}px ${aw / 2}px 0 0` }), x, ay, aw, ah);
+          const m = motif(name, a, aw / 2, ah * 0.56, aw * 0.6, ah * 0.52);
+          const L = el("div", "label", track);
+          L.style.left = px(x);
+          L.style.top = px(ay + ah + 0.03 * H);
+          const lw = el("span", "w", L);
+          lw.textContent = lab;
+          const t = revealAt[i];
+          archRise(a, aw, t);
+          tl.fromTo(m, { yPercent: 40, scale: 0.7 }, { yPercent: 0, scale: 1, duration: 0.9, ease: "expo.out" }, t + 0.12);
+          rise(lw, t + 0.18, 0.6);
+          return { a, m, x };
+        });
+        // the track slides on the nudge curve (slow-fast-slow) to bring the next arches in
+        let shift = 0;
+        NUDGES.forEach(([t, n]) => {
+          const from = shift;
+          shift += n * (aw + ag);
+          const d = 0.9;
+          const t0 = t - 0.2 * d;
+          tl.to(track, { x: -(from + 0.1 * (shift - from)), duration: 0.2 * d, ease: "power3.in" }, t0);
+          tl.to(track, { x: -(from + 0.75 * (shift - from)), duration: 0.18 * d, ease: "none" }, t0 + 0.2 * d);
+          tl.to(track, { x: -shift, duration: 0.62 * d, ease: "power4.out" }, t0 + 0.38 * d);
+        });
+        // ARCH TRANSITION: the blue Venus arch opens into the palette
+        const FOCUS = 5;
+        const fx = archEls[FOCUS].x - shift;
+        tl.to(archEls[FOCUS].m, { yPercent: -30, opacity: 0, duration: 0.45, ease: "expo.in" }, T(7, 1.5) - 0.45);
+
+        // ================================================================== 02 PALETA (bars 8-10)
+        const paCam = $("#pa-cam");
+        tl.fromTo("#pa-arch", { clipPath: archInset(fx, ay, aw, ah) }, { clipPath: FULL, duration: T(8) - T(7, 2), ease: "expo.inOut" }, T(7, 2));
+        const cw = (P ? 0.16 : 0.12) * W;
+        const cg = 0.02 * W;
+        const cx0 = (W - (5 * cw + 4 * cg)) / 2;
+        const cy = (P ? 0.24 : 0.21) * H;
+        const chh = (P ? 0.52 : 0.64) * H;
+        const BLOCK = {
+          blue: [0, 0, 42.6, 44.5],
+          terra: [42.6, 0, 57.4, 44.5],
+          sand: [0, 44.5, 30.8, 55.5],
+          grey: [30.8, 44.5, 46.7, 55.5],
+          cream: [77.5, 44.5, 22.5, 55.5],
+        };
+        const HEXPOS = { blue: [21.3, 34], terra: [71.3, 34], sand: [15.4, 86], grey: [54.1, 54], cream: [88.7, 86] };
+        const COLS = ["blue", "terra", "sand", "grey", "cream"];
+        COLS.forEach((key, i) => {
+          const s = el("div", "sw", paCam, { background: C[key], zIndex: String(5 - i) });
+          const x = cx0 + i * (cw + cg);
+          const colInset = archInset(x, cy, cw, chh);
+          const [bx, by, bw, bh] = BLOCK[key];
+          const blockInset = `inset(${by}% ${100 - bx - bw}% ${100 - by - bh}% ${bx}% round 0px 0px 0px 0px)`;
+          const hx = el("div", "hex", paCam, { zIndex: "10" });
+          const hw = el("span", "w", hx);
+          hw.textContent = "#" + C[key].slice(1);
+          // label sits at the column foot, then travels with the fold to the manual's spot
+          const lx = x + cw / 2;
+          const ly = cy + chh - 0.06 * H;
+          gsap.set(hx, { left: lx, top: ly, xPercent: -50 });
+          if (i === 0) {
+            // the arch that opened the scene folds down into the first column
+            gsap.set(s, { clipPath: FULL });
+            tl.to(s, { clipPath: colInset, duration: 0.7, ease: "expo.inOut" }, T(8) + 0.05);
+          } else {
+            gsap.set(s, { clipPath: `inset(100% ${((W - x - cw) / W) * 100}% 0% ${(x / W) * 100}% round ${cw / 2}px ${cw / 2}px 0px 0px)` });
+            tl.to(s, { clipPath: colInset, duration: 0.8, ease: "expo.out" }, T(8, i));
+          }
+          rise(hw, T(8, i) + 0.35, 0.6);
+          if (key === "cream") {
+            const ns = "http://www.w3.org/2000/svg";
+            const o = document.createElementNS(ns, "svg");
+            o.setAttribute("class", "abs");
+            o.setAttribute("viewBox", `0 0 ${cw} ${chh}`);
+            Object.assign(o.style, { left: px(x), top: px(cy), width: px(cw), height: px(chh), overflow: "visible", zIndex: "6" });
+            const path = document.createElementNS(ns, "path");
+            path.setAttribute("d", `M0 ${chh} L0 ${cw / 2} A${cw / 2} ${cw / 2} 0 0 1 ${cw} ${cw / 2} L${cw} ${chh} Z`);
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke", C.navy);
+            path.setAttribute("stroke-width", "1.5");
+            path.setAttribute("stroke-opacity", "0.45");
+            o.appendChild(path);
+            paCam.appendChild(o);
+            const len = path.getTotalLength();
+            gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+            tl.to(path, { strokeDashoffset: 0, duration: 0.9, ease: "expo.out" }, T(8, i));
+            tl.to(o, { opacity: 0, duration: 0.3, ease: "none" }, T(10) - 0.75);
+          }
+          // bar 9 beat 3: the colonnade folds into the block of the manual, landing on bar 10
+          tl.to(s, { clipPath: blockInset, duration: 1.0, ease: "expo.inOut" }, T(10) - 0.75);
+          tl.to(hx, { x: (HEXPOS[key][0] / 100) * W - lx, y: (HEXPOS[key][1] / 100) * H - ly, duration: 1.0, ease: "expo.inOut" }, T(10) - 0.75);
+        });
+        tl.fromTo(paCam, { scale: 1.0 }, { scale: 1.035, duration: T(11) - T(10), ease: "none" }, T(10));
+        push("#pa-push", "#ty-push", T(11));
+
+        // ================================================================== 03 TIPOGRAFÍA (bars 11-12, the break)
+        const split = P ? 0.56 * H : 0.56 * W;
+        if (P) {
+          place($("#ty-left"), 0, 0, W, split);
+          place($("#ty-right"), 0, split, W, H - split);
+        } else {
+          place($("#ty-left"), 0, 0, split, H);
+          place($("#ty-right"), split, 0, W - split, H);
+        }
+        const tx = P ? 0.08 * W : 0.08 * W;
+        const aaTop = P ? 0.1 * H : 0.16 * H;
+        Object.assign($("#ty-aa").style, { left: px(tx), top: px(aaTop) });
+        const aaH = (P ? 0.19 : 0.34) * H;
+        place($("#ty-rule"), tx, aaTop + aaH * 1.02, (P ? 0.5 : 0.22) * W, 2);
+        Object.assign($("#ty-l1").style, { left: px(tx), top: px(aaTop + aaH * 1.02 + 0.03 * H) });
+        Object.assign($("#ty-s1").style, { left: px(tx), top: px(aaTop + aaH * 1.02 + 0.075 * H) });
+        Object.assign($("#ty-s2").style, { left: px(tx), top: px(aaTop + aaH * 1.02 + (P ? 0.11 : 0.15) * H) });
+        const qW = (P ? 0.84 : 0.36) * W;
+        const qx = P ? 0.08 * W : split + (W - split - qW) / 2;
+        const qy = P ? split + 0.08 * H : 0.3 * H;
+        Object.assign($("#ty-l2").style, { left: px(qx), top: px(qy) });
+        place($("#ty-q"), qx, qy + 0.05 * H, qW, qW * LOGO_AR);
+        place($("#tyq"), 0, 0, qW, qW * LOGO_AR);
+        // the Quentin line in the logo, shifted so the script (not the caps) fills the box
+        gsap.set("#tyq-script", { yPercent: -28 });
+        rise($("#ty-aa .w"), T(11, 0.5), 0.9);
+        tl.fromTo("#ty-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, T(11, 1));
+        rise($("#ty-l1 .w"), T(11, 1.5), 0.6);
+        ["#ty-s1 .w", "#ty-s2 .w"].forEach((s, i) => {
+          const line = $(s);
+          const chars = Array.from(line.textContent);
+          line.textContent = "";
+          const spans = chars.map((ch) => {
+            const c = el("span", "", line, { display: "inline-block" });
+            c.textContent = ch;
+            return c;
+          });
+          rise(line, T(11, 2 + i), 0.8);
+          // the alphabet tracks in from wide spacing (per-letter transforms, not letter-spacing)
+          const wide = (P ? 0.012 : 0.009) * W;
+          spans.forEach((c, j) => {
+            tl.fromTo(c, { x: (j - (spans.length - 1) / 2) * wide }, { x: 0, duration: 1.4, ease: "expo.out" }, T(11, 2 + i));
+          });
+        });
+        rise($("#ty-l2 .w"), T(11, 3.5), 0.6);
+        tl.fromTo("#tyq-script", { clipPath: "inset(-20% 100% -20% 0%)" }, { clipPath: "inset(-20% 0% -20% 0%)", duration: 1.4, ease: "power1.inOut" }, T(12));
+
+        // ================================================================== 04 PATRONES (bars 13-16, the drop)
+        // an arch opens from the bottom centre and lands on the drop
+        const oa = (P ? 0.3 : 0.14) * W;
+        tl.fromTo("#pt-arch", { clipPath: archInset(W / 2 - oa / 2, H * 0.62, oa, H * 0.38) }, { clipPath: FULL, duration: T(13) - T(12, 2), ease: "expo.in" }, T(12, 2));
+        const bands = $("#pt-bands");
+        const gut = 8;
+        const bandBox = (i) => (P ? [0, (i * H) / 3, W, H / 3 - gut] : [(i * W) / 3, 0, W / 3 - gut, H]);
+        const bandInset = (b) => `inset(${(b[1] / H) * 100}% ${((W - b[0] - b[2]) / W) * 100}% ${((H - b[1] - b[3]) / H) * 100}% ${(b[0] / W) * 100}%)`;
+        const BANDS = [];
+        // A: vases (vector tile, seamless)
+        const bA = el("div", "band", bands);
+        const tileW = P ? 170 : 210;
+        const tA = place(el("div", "tile", bA), -W, -H, 3 * W, 3 * H);
+        tA.style.backgroundSize = `${tileW}px ${tileW * (99.213 / 70.866)}px`;
+        tA.setAttribute("data-layout-allow-overflow", "");
+        BANDS.push([bA, tA]);
+        // B: greek motifs (manual page 5)
+        const bB = el("div", "band", bands);
+        const gB = el("div", "fill", bB);
+        const gImg = img("assets/img/pattern-greek.jpg", gB, 1418, 1970, W, H * 1.25, 0.5, 0.5, 1.0);
+        BANDS.push([bB, gB]);
+        // C: masks wallpaper
+        const bC = el("div", "band", bands);
+        const mC = el("div", "fill", bC);
+        // keep to the wallpaper above the furniture line of the room photo
+        img("assets/img/wall-masks.jpg", mC, 1418, 984, W, H * 1.2, 0.5, 0.0, P ? 1.7 : 1.15);
+        BANDS.push([bC, mC]);
+        const pd = T(17) - T(12, 2);
+        BANDS.forEach(([b, inner], i) => {
+          gsap.set(b, { clipPath: bandInset(bandBox(i)) });
+          const dir = i % 2 === 0 ? -1 : 1;
+          const amt = (P ? 0.14 * W : 0.12 * H) * dir;
+          tl.fromTo(inner, P ? { x: -amt } : { y: -amt }, P ? { x: amt, duration: pd, ease: "none" } : { y: amt, duration: pd, ease: "none" }, T(12, 2));
+        });
+        // bar 14: the greek band opens to full frame, its neighbours slide out of the way
+        tl.to(bB, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
+        tl.to(bA, { ...(P ? { y: -H / 3 } : { x: -W / 3 }), duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
+        tl.to(bC, { ...(P ? { y: H / 3 } : { x: W / 3 }), duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
+        // bar 14 beat 3: MATCH CUT — the flat pattern becomes the sheet coming out of the printer
+        const photo = $("#pt-photo");
+        const PB = P ? [0, 0.25 * H, W, 0.5 * H] : [0, 0, W, H];
+        const pr = place(el("div", "box", photo, { boxShadow: P ? "0 40px 80px rgba(0,0,0,0.25)" : "none" }), ...PB);
+        const prImg = img("assets/img/printer-greek.jpg", pr, 1418, 987, PB[2], PB[3], 0.5, 0.5, 1.02);
+        gsap.set(pr, { opacity: 0 });
+        tl.set(pr, { opacity: 1 }, T(14, 2));
+        tl.fromTo(prImg, { scale: 2.1, transformOrigin: "62% 72%" }, { scale: 1, duration: 1.1, ease: "expo.out" }, T(14, 2));
+        // bars 15-16: photos arrive in slats, one every two beats
+        const SLATS = [
+          ["printer-masks", 1418, 984, 0.5, 0.55, T(15)],
+          ["roll-greek", 1418, 984, 0.5, 0.5, T(15, 2)],
+          ["roll-masks", 1418, 984, 0.5, 0.5, T(16)],
+          ["card-patterns", 1418, 1970, 0.5, 0.5, T(16, 2)],
+        ];
+        SLATS.forEach(([n, iw, ih, fxx, fyy, t]) => slats(photo, `assets/img/${n}.jpg`, iw, ih, PB, t, fxx, fyy));
+        push("#pt-push", "#ap-push", T(17));
+
+        // ================================================================== 05 APLICACIONES (bars 17-20)
+        const SPREADS = [
+          ["TEXTILES", "swatches", 1418, 1970, "swatch-masks", 1418, 987],
+          ["PAPEL MURAL", "roll-light", 709, 1970, "wall-masks", 1418, 984],
+          ["CUADROS", "frame-palm", 1418, 1970, "frame-masks", 1418, 787],
+          ["SEÑALÉTICA · PAPELERÍA", "sign", 1418, 1970, "cards-wood", 1418, 790],
+        ];
+        const G = P
+          ? { arch: [0.08 * W, 0.13 * H, 0.52 * W, 0.42 * H], box: [0.3 * W, 0.5 * H, 0.62 * W, 0.28 * H], cap: [0.08 * W, 0.84 * H], idx: [0.92 * W, 0.12 * H] }
+          : { arch: [0.07 * W, 0.17 * H, 0.29 * W, 0.73 * H], box: [0.42 * W, 0.24 * H, 0.51 * W, 0.5 * H], cap: [0.42 * W, 0.8 * H], idx: [0.93 * W, 0.17 * H] };
+        const apPush = $("#ap-push");
+        const spreadT = [T(17), T(18), T(19), T(20)];
+        SPREADS.forEach(([cap, aImg, aw2, ah2, bImg, bw2, bh2], i) => {
+          const sp = el("div", "fill", apPush);
+          const [axx, ayy, aww, ahh] = G.arch;
+          const a = place(el("div", "arch", sp, { borderRadius: `${aww / 2}px ${aww / 2}px 0 0` }), axx, ayy, aww, ahh);
+          const ai = img(`assets/img/${aImg}.jpg`, a, aw2, ah2, aww, ahh, 0.5, 0.45, 1.08);
+          const b = place(el("div", "box", sp), ...G.box);
+          const bi = img(`assets/img/${bImg}.jpg`, b, bw2, bh2, G.box[2], G.box[3], 0.5, 0.5, 1.08);
+          const c = el("div", "caption", sp);
+          Object.assign(c.style, { left: px(G.cap[0]), top: px(G.cap[1]) });
+          const cw2 = el("span", "w", c);
+          cw2.textContent = cap;
+          const ix = el("div", "label", sp);
+          Object.assign(ix.style, { left: px(G.idx[0]), top: px(G.idx[1]), transform: "translateX(-100%)" });
+          const iw2 = el("span", "w", ix);
+          iw2.textContent = `0${i + 1} / 04`;
+          const t0 = spreadT[i];
+          // reveals: arch rises, box wipes in from the right, caption and index rise — on the 8ths
+          archRise(a, aww, t0 + (i === 0 ? 0.25 : 0.15));
+          tl.fromTo(b, { clipPath: "inset(0% 0% 0% 100%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: "expo.out", immediateRender: true }, t0 + E8 + 0.1);
+          rise(cw2, t0 + 2 * E8 + 0.1, 0.7);
+          rise(iw2, t0 + 3 * E8 + 0.1, 0.6);
+          tl.fromTo(ai, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: "power2.out" }, t0);
+          tl.fromTo(bi, { scale: 1.1 }, { scale: 1, duration: 2.2, ease: "power2.out" }, t0 + E8);
+          // page turns on the next downbeat, with parallax: the arch travels further than the box
+          if (i < SPREADS.length - 1) {
+            const tn = spreadT[i + 1];
+            gsap.set(sp, { x: i === 0 ? 0 : W });
+            if (i > 0) tl.to(sp, { x: 0, duration: 0.8, ease: "expo.inOut" }, spreadT[i] - 0.4);
+            tl.to(sp, { x: -W, duration: 0.8, ease: "expo.inOut" }, tn - 0.4);
+            tl.to(a, { x: -0.18 * W, duration: 0.8, ease: "expo.inOut" }, tn - 0.4);
+            tl.to(c, { x: 0.06 * W, duration: 0.8, ease: "expo.inOut" }, tn - 0.4);
+          } else {
+            gsap.set(sp, { x: W });
+            tl.to(sp, { x: 0, duration: 0.8, ease: "expo.inOut" }, spreadT[i] - 0.4);
+          }
+          if (i > 0) {
+            tl.fromTo(a, { x: 0.18 * W }, { x: 0, duration: 0.8, ease: "expo.inOut", immediateRender: false }, spreadT[i] - 0.4);
+          }
+        });
+
+        // ================================================================== 06 CIERRE (bars 21-23)
+        const ca = (P ? 0.3 : 0.14) * W;
+        tl.fromTo("#cl-arch", { clipPath: archInset(W / 2 - ca / 2, H * 0.62, ca, H * 0.38) }, { clipPath: FULL, duration: T(21) - T(20, 2), ease: "expo.in" }, T(20, 2));
+        const CW = (P ? 0.84 : 0.56) * W;
+        const ck = CW / LU;
+        const clCy = H * (P ? 0.42 : 0.42);
+        logoGeom("cl", CW, W / 2, clCy);
+        $$(".cl-cap").forEach((c, i) => {
+          const off = ((i - 7.5) * spread * 0.8) / ck;
+          gsap.set(c, { opacity: 0, x: off });
+          tl.to(c, { opacity: 1, duration: 0.5, ease: "power2.out" }, T(21) - 0.3 + i * 0.03);
+          tl.to(c, { x: 0, duration: 1.2, ease: "expo.out" }, T(21) - 0.3);
+        });
+        tl.fromTo("#cl-script", { clipPath: "inset(-20% 100% -20% 0%)" }, { clipPath: "inset(-20% 0% -20% 0%)", duration: 1.0, ease: "power1.inOut" }, T(21, 1));
+        // bar 22: the motifs line up beneath the logo, one per 8th
+        const ROW = ["bust", "helmet", "horse", "cup", "venus"];
+        const rowY = clCy + (CW * LOGO_AR) / 2 + (P ? 0.12 : 0.17) * H;
+        const rowGap = (P ? 0.17 : 0.085) * W;
+        const clMotifs = $("#cl-motifs");
+        const rowEls = ROW.map((name, i) => {
+          const m = motif(name, clMotifs, W / 2 + (i - 2) * rowGap, rowY, (P ? 0.12 : 0.06) * W, (P ? 0.07 : 0.11) * H);
+          gsap.set(m, { yPercent: 60, opacity: 0 });
+          tl.to(m, { yPercent: 0, opacity: 1, duration: 0.6, ease: "expo.out" }, T(22) + i * E8);
+          return m;
+        });
+        place($("#cl-rule"), W / 2 - CW * 0.25, clCy + (CW * LOGO_AR) / 2 + (P ? 0.035 : 0.05) * H, CW * 0.5, 2);
+        tl.fromTo("#cl-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "expo.inOut" }, T(21, 3));
+        // band pickup and the last golpe (bar 23 = 44.0 s)
+        [T(22, 3), T(22, 3.5)].forEach((t) => {
+          tl.to("#cl-cam", { scale: 0.985, duration: 0.07, ease: "power2.out" }, t);
+          tl.to("#cl-cam", { scale: 1, duration: 0.12, ease: "power2.inOut" }, t + 0.07);
+        });
+        tl.to("#cl-cam", { scale: 1.04, duration: 0.08, ease: "power2.out" }, T(23));
+        tl.to("#cl-cam", { scale: 1, duration: 0.9, ease: "expo.out" }, T(23) + 0.08);
+        rowEls.forEach((m, i) => {
+          tl.to(m, { y: -0.025 * H, duration: 0.14, ease: "power2.out" }, T(23) + i * 0.03);
+          tl.to(m, { y: 0, duration: 0.5, ease: "expo.out" }, T(23) + 0.14 + i * 0.03);
+        });
+
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>
