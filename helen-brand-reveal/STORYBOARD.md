@@ -21,8 +21,8 @@
 | → | Zoom hacia la empanada de línea → tarjeta redondeada que se abre a pantalla completa | corte 28,90 | c14 t1 | El dibujo de la empanada se convierte en las empanadas reales |
 | 7 | Comida y apetito (lo más enérgico) | 28,90–37,77 | 14–17 | Un revelado con máscara cada medio compás (wipe hacia la izquierda; iris circular en los punch‑ins), con el punto más rápido de cada transición en el golpe: empanadas, pizza, relleno, canelones en tarjeta, split, tríptico, queso, empanadas. "Hecho con amor, *como en casa.*" entra palabra por corchea y se mantiene entre los cortes |
 | → | Barrido de paneles (naranja · verde · beige) | corte 37,77 | c18 t1 | — |
-| 8 | Aplicaciones: mundo 2.5D con parallax | 37,77–44,43 | 18–20 | La cámara aterriza en cada golpe con el logo del mockup centrado (match de logo a logo): cartel, vidriera, laptop, caja de pizza, bolsa, menú y delantal |
-| → | Iris verde que se abre desde el logo del delantal | corte 44,43 | c21 t1 | — |
+| 8 | Aplicaciones: muro bento de mockups (cartel, vidriera, laptop, caja de pizza, bolsa, menú, delantal) | 37,77–44,43 | 18–20 | Columnas con esquinas redondeadas que se deslizan en direcciones opuestas (parallax) sobre un plano 2.5D que se endereza; los mockups se abren con máscara en fusas. **c20:** la cámara vuela hacia la vidriera hasta llenar el cuadro (aterriza en c20 t3) |
+| → | Iris verde que se abre desde el logo de la vidriera | corte 44,43 | c21 t1 | — |
 | 9 | Cierre (verde) | 44,43–48,17 | 21–22 | **Crash c21:** el logo llega; "Catering a medida" en corcheas y "Sabores que hacen momentos especiales". Remates de la banda en c21 t4 y t4½ (el logo se recoge). **Último golpe c22 = 46,67 s:** pulso del logo + glow. Hold de 1,5 s mientras resuena el acorde final |
 
 **Identidad:** el logo es el vector original del PDF (página 1), sin deformar ni recolorear; el isotipo solo se separa durante el dibujo de la intro y aterriza en su posición exacta. Los textos van en Fraunces (soft) como reemplazo de Recoleta. Colores: solo los cinco de la paleta.

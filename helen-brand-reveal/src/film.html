@@ -313,21 +313,18 @@
       #s-apps {
         background: var(--beige);
       }
-      .world {
+      .bcol {
         position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 0;
-        height: 0;
-        transform-style: preserve-3d;
+        top: 0;
       }
-      .mock {
+      .tile {
         position: absolute;
+        left: 0;
         overflow: hidden;
-        box-shadow: 0 50px 100px rgba(7, 35, 5, 0.22);
         border-radius: 22px;
+        box-shadow: 0 30px 70px rgba(7, 35, 5, 0.18);
       }
-      .mock img {
+      .tile img {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -569,9 +566,9 @@
         <div id="ap-op" class="fill">
           <div id="ap-pull" class="fill">
             <div id="ap-in" class="fill">
-              <div id="ap-persp" class="fill persp" style="perspective: 1800px">
-                <div id="ap-drift" class="fill" style="transform-style: preserve-3d">
-                  <div id="world" class="world"></div>
+              <div id="ap-zoom" class="fill">
+                <div class="fill persp" style="perspective: 2200px">
+                  <div id="bento" class="fill"></div>
                 </div>
               </div>
             </div>
@@ -1050,59 +1047,105 @@
         const fdw = $$("#fd-text .w");
         const fdTimes = [T(14, 1), T(14, 1.5), T(14, 2), T(15, 1), T(15, 1.5), T(15, 2)];
         fdw.forEach((w, i) => rise(w, fdTimes[i], 0.6));
-        // WHIP to the LEFT into the applications world (directional blur, matched speed)
         // brand panel wipe into the applications world; content keeps moving left under it
         tl.to("#fd-whip", { x: -0.25 * W, duration: 0.42, ease: "expo.in" }, T(18) - 0.42);
         panelWipe(T(18), ["#FEA300", "#072305", "#E3D8C5"]);
 
-        // ================================================================== 8 APLICACIONES (2.5D world)
-        const world = $("#world");
-        const MOCKS = P
-          ? [
-              ["cartel-b", 1419, 1971, 1100, 0.505, 0.465, [0, 0, 0], 6],
-              ["vidriera", 1419, 1971, 1100, 0.462, 0.423, [980, 40, -520], -7],
-              ["laptop", 1419, 1971, 1100, 0.43, 0.335, [1960, -30, 90], 5],
-              ["caja-pizza", 1419, 786, 560, 0.48, 0.42, [2960, 30, -320], -5],
-              ["bolsa-kraft", 472, 427, 520, 0.44, 0.67, [3900, -20, 120], 6],
-              ["menu", 472, 591, 640, 0.575, 0.206, [4800, 30, -380], -6],
-              ["delantal", 472, 427, 520, 0.523, 0.699, [5650, 0, 60], 0],
-            ]
-          : [
-              ["cartel-b", 1419, 1971, 860, 0.505, 0.465, [0, 0, 0], 6],
-              ["vidriera", 1419, 1971, 860, 0.462, 0.423, [1150, 40, -480], -7],
-              ["laptop", 1419, 1971, 860, 0.43, 0.335, [2250, -30, 90], 5],
-              ["caja-pizza", 1419, 786, 620, 0.48, 0.42, [3450, 30, -300], -5],
-              ["bolsa-kraft", 472, 427, 520, 0.44, 0.67, [4600, -20, 120], 6],
-              ["menu", 472, 591, 640, 0.575, 0.206, [5500, 30, -360], -6],
-              ["delantal", 472, 427, 520, 0.523, 0.699, [6350, 0, 60], 0],
-            ];
-        const stops = MOCKS.map(([name, iw, ih, dh, lx, ly, pos, ry]) => {
-          const h = dh;
-          const w = (h * iw) / ih;
-          const m = document.createElement("div");
-          m.className = "mock";
-          // place the card so its logo point sits at pos (the camera targets logos)
-          Object.assign(m.style, { width: w + "px", height: h + "px", left: -lx * w + "px", top: -ly * h + "px" });
-          const img = document.createElement("img");
-          img.src = `assets/img/${name}.jpg`;
-          img.alt = "";
-          m.appendChild(img);
-          world.appendChild(m);
-          gsap.set(m, { x: pos[0], y: pos[1], z: pos[2], rotationY: ry, transformOrigin: `${lx * 100}% ${ly * 100}%` });
-          return { x: -pos[0], y: -pos[1], z: -pos[2] };
+        // ================================================================== 8 APLICACIONES (bento wall)
+        // BENTO WALL: columns of rounded mockups drift in opposite directions (parallax) on a
+        // table-top plane that straightens up; tiles open on the 16ths, then the camera flies into
+        // the shop window and its logo opens the closing iris.
+        const MOCK = {
+          "cartel-b": [1419, 1971, 0.505, 0.465],
+          vidriera: [1419, 1971, 0.462, 0.423],
+          laptop: [1419, 1971, 0.43, 0.335],
+          "caja-pizza": [1419, 786, 0.48, 0.42],
+          "bolsa-kraft": [472, 427, 0.44, 0.67],
+          menu: [472, 591, 0.575, 0.206],
+          delantal: [472, 427, 0.523, 0.699],
+        };
+        // columns long enough to cover the frame for the whole scroll (and in 9:16)
+        const COLS = [
+          ["menu", "laptop", "bolsa-kraft", "cartel-b", "caja-pizza", "delantal", "vidriera", "menu"],
+          ["laptop", "delantal", "caja-pizza", "vidriera", "bolsa-kraft", "cartel-b", "menu", "laptop"],
+          ["cartel-b", "caja-pizza", "menu", "delantal", "laptop", "bolsa-kraft", "vidriera", "caja-pizza"],
+          ["bolsa-kraft", "delantal", "vidriera", "caja-pizza", "menu", "cartel-b", "laptop", "delantal"],
+        ].slice(0, P ? 3 : 4);
+        const TCOL = 1; // the column holding the hero shop window
+        const TIDX = 3;
+        const TWD = P ? 300 : 380;
+        const GAP = P ? 20 : 26;
+        const nC = COLS.length;
+        const x0 = (W - (nC * TWD + (nC - 1) * GAP)) / 2;
+        const bento = $("#bento");
+        const tiles = [];
+        let hero = null;
+        COLS.forEach((list, c) => {
+          const col = document.createElement("div");
+          col.className = "bcol";
+          Object.assign(col.style, { left: x0 + c * (TWD + GAP) + "px", width: TWD + "px" });
+          let y = 0;
+          list.forEach((name, r) => {
+            const [iw, ih, lx, ly] = MOCK[name];
+            const th = (TWD * ih) / iw;
+            const t = document.createElement("div");
+            t.className = "tile";
+            Object.assign(t.style, { top: y + "px", width: TWD + "px", height: th + "px" });
+            const img = document.createElement("img");
+            img.src = `assets/img/${name}.jpg`;
+            img.alt = "";
+            t.appendChild(img);
+            col.appendChild(t);
+            tiles.push({ t, img, c, top: y });
+            if (c === TCOL && r === TIDX) hero = { top: y, h: th, lx, ly };
+            y += th + GAP;
+          });
+          col.dataset.h = String(y);
+          bento.appendChild(col);
         });
-        const stopT = [T(18), T(18, 2), T(19), T(19, 2), T(20), T(20, 2), T(20, 3)];
-        gsap.set(world, { x: stops[0].x, y: stops[0].y, z: stops[0].z });
-        for (let i = 1; i < stops.length; i++) {
-          const dur = i === stops.length - 1 ? 0.42 : 0.56;
-          // each travel lands its logo dead-centre on the beat — a logo-to-logo match every stop
-          tl.to(world, { x: stops[i].x, y: stops[i].y, z: stops[i].z, duration: dur, ease: "power3.inOut" }, stopT[i] - dur);
-        }
-        tl.fromTo("#ap-drift", { x: 0.02 * W }, { x: -0.03 * W, duration: T(21) - T(18), ease: "none" }, T(18));
-        // the world slides in from the right under the panel wipe
+        const cols = $$(".bcol", bento);
+        // the hero column decelerates so the shop-window logo parks dead centre for the fly-in
+        const heroLogoY = hero.top + hero.ly * hero.h;
+        const heroEndY = H / 2 - heroLogoY;
+        const parkT = T(20);
+        cols.forEach((col, c) => {
+          if (c === TCOL) {
+            tl.fromTo(col, { y: heroEndY + 0.3 * H }, { y: heroEndY, duration: parkT - T(18), ease: "power2.out" }, T(18));
+          } else {
+            const dir = c % 2 === 0 ? -1 : 1;
+            const base = -0.3 * H;
+            tl.fromTo(col, { y: base - dir * 0.12 * H }, { y: base + dir * 0.12 * H, duration: T(21) - T(18), ease: "none" }, T(18));
+          }
+        });
+        // tiles open with a rounded mask on the 32nds, starting with what is on screen at the cut
+        const colY0 = (c) => (c === TCOL ? heroEndY + 0.3 * H : -0.3 * H - (c % 2 === 0 ? -1 : 1) * 0.12 * H);
+        tiles
+          .map((o) => ({ ...o, sy: colY0(o.c) + o.top, sh: o.t.offsetHeight }))
+          .sort((a, b) => {
+            const va = a.sy + a.sh > 0 && a.sy < H ? 0 : 1;
+            const vb = b.sy + b.sh > 0 && b.sy < H ? 0 : 1;
+            return va - vb || a.sy - b.sy || a.c - b.c;
+          })
+          .forEach((o, i) => {
+            const t = T(18) + 0.02 + i * (E16 / 2);
+            tl.fromTo(o.t, { clipPath: "inset(100% 0% 0% 0% round 22px)" }, { clipPath: "inset(0% 0% 0% 0% round 22px)", duration: 0.6, ease: "expo.out", immediateRender: true }, t);
+            tl.fromTo(o.img, { scale: 1.25 }, { scale: 1, duration: 0.9, ease: "expo.out", immediateRender: true }, t);
+          });
+        // camera with intent: the table-top plane straightens while the wall builds
+        tl.fromTo(bento, { rotationX: 26, rotationZ: -7, scale: 0.9 }, { rotationX: 0, rotationZ: 0, scale: 1, duration: parkT - T(18), ease: "power2.inOut" }, T(18));
+        // fly into the shop window until it fills the frame, landing on bar 20 beat 3
+        const heroX = x0 + TCOL * (TWD + GAP) + hero.lx * TWD;
+        // scale so the shop window covers the frame on every side of its (centred) logo
+        const fillS =
+          1.04 *
+          Math.max(W / 2 / (hero.lx * TWD), W / 2 / ((1 - hero.lx) * TWD), H / 2 / (hero.ly * hero.h), H / 2 / ((1 - hero.ly) * hero.h));
+        gsap.set("#ap-zoom", { transformOrigin: `${heroX}px ${H / 2}px` });
+        tl.to("#ap-zoom", { x: W / 2 - heroX, scale: fillS, duration: T(20, 2) - parkT, ease: "expo.inOut" }, parkT);
+        tl.to("#ap-zoom", { scale: fillS * 1.06, duration: T(21) - T(20, 2), ease: "none" }, T(20, 2));
+        // the wall slides in from the right under the panel wipe
         tl.fromTo("#ap-in", { x: 0.25 * W }, { x: 0, duration: 0.6, ease: "expo.out" }, T(18));
-        // green iris opens from the apron's logo (dead centre) and becomes the closing ground
-        tl.to("#ap-pull", { scale: 0.86, duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
+        // green iris opens from the shop-window logo (dead centre) and becomes the closing ground
+        tl.to("#ap-pull", { scale: 1.12, duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
         tl.to("#ap-iris", { clipPath: "circle(80% at 50% 50%)", duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
 
         // ================================================================== 9 CIERRE
