@@ -148,19 +148,6 @@
         white-space: nowrap;
         display: flex;
       }
-      .reel {
-        display: inline-block;
-        height: 1.2em;
-        overflow: hidden;
-        vertical-align: top;
-      }
-      .reel .col {
-        display: block;
-      }
-      .reel .col span {
-        display: block;
-        height: 1.2em;
-      }
       #pal-expand {
         background: var(--orange);
         opacity: 0;
@@ -291,8 +278,8 @@
       .card {
         position: absolute;
         overflow: hidden;
-        border: 12px solid var(--cream);
-        box-shadow: 0 34px 70px rgba(0, 0, 0, 0.45);
+        border-radius: 28px;
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.4);
       }
       .fd-scrim {
         position: absolute;
@@ -337,8 +324,8 @@
       .mock {
         position: absolute;
         overflow: hidden;
-        box-shadow: 0 40px 80px rgba(7, 35, 5, 0.28);
-        border-radius: 6px;
+        box-shadow: 0 50px 100px rgba(7, 35, 5, 0.22);
+        border-radius: 22px;
       }
       .mock img {
         position: absolute;
@@ -385,64 +372,33 @@
         color: var(--beige);
       }
 
-      /* finish: warm vignette + very light grain (registry: vignette, grain-overlay) */
-      #hf-vignette {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 90;
-        background: radial-gradient(ellipse at center, transparent 62%, rgba(40, 22, 0, 0.15) 100%);
-      }
-      #grain-overlay {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 100;
+      /* modern finish: clean flat colour, no grain/vignette */
+      .mk {
+        display: inline-block;
         overflow: hidden;
-        mix-blend-mode: soft-light;
+        vertical-align: bottom;
+        padding: 0.06em 0.08em 0.2em;
+        margin: -0.06em -0.08em -0.2em;
       }
-      @keyframes hf-grain-noise {
-        0%,
-        100% {
-          transform: translate(0, 0);
-        }
-        10% {
-          transform: translate(-5%, -5%);
-        }
-        20% {
-          transform: translate(-10%, 5%);
-        }
-        30% {
-          transform: translate(5%, -10%);
-        }
-        40% {
-          transform: translate(-5%, 15%);
-        }
-        50% {
-          transform: translate(-10%, 5%);
-        }
-        60% {
-          transform: translate(15%, 0);
-        }
-        70% {
-          transform: translate(0, 10%);
-        }
-        80% {
-          transform: translate(-15%, 0);
-        }
-        90% {
-          transform: translate(10%, 5%);
-        }
-      }
-      #grain-overlay .grain-texture {
+      #wipes {
         position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        opacity: 0.22;
-        animation: hf-grain-noise 0.5s steps(1) 97 both;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 80;
+      }
+      .band {
+        position: absolute;
+        top: -10%;
+        height: 120%;
+        left: 0;
+      }
+      .iris {
+        position: absolute;
+        inset: 0;
+        background: var(--green);
+        clip-path: circle(0% at 50% 50%);
+        z-index: 20;
       }
 
       /* 9:16 reframe */
@@ -501,15 +457,6 @@
       data-height="1080"
     >
       <audio id="bgm" src="assets/bgm.mp3" data-start="0" data-duration="48.167" data-track-index="11" data-volume="1"></audio>
-
-      <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-        <filter id="whip-out" x="-20%" y="-5%" width="140%" height="110%">
-          <feGaussianBlur id="whip-out-blur" stdDeviation="0 0" />
-        </filter>
-        <filter id="whip-in" x="-20%" y="-5%" width="140%" height="110%">
-          <feGaussianBlur id="whip-in-blur" stdDeviation="0 0" />
-        </filter>
-      </svg>
 
       <!-- 1-2 · INTRO + LOGO REVEAL -->
       <div id="s-logo" class="scene clip" data-start="0.0000" data-duration="8.9000" data-track-index="1">
@@ -630,6 +577,7 @@
             </div>
           </div>
         </div>
+        <div class="iris" id="ap-iris"></div>
       </div>
 
       <!-- 9 · CIERRE -->
@@ -646,8 +594,7 @@
         </div>
       </div>
 
-      <div id="hf-vignette"></div>
-      <div id="grain-overlay"><div class="grain-texture" data-layout-allow-overflow></div></div>
+      <div id="wipes"></div>
     </div>
 
     <script>
@@ -665,25 +612,9 @@
         const $ = (s, r = document) => r.querySelector(s);
         const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-        // seeded PRNG for the hex reels (deterministic)
-        let seed = 0x48656c65;
-        const rand = () => {
-          seed |= 0;
-          seed = (seed + 0x6d2b79f5) | 0;
-          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-        };
-
         const tl = gsap.timeline({ paused: true });
 
         // ------------------------------------------------------------------ helpers
-        // waterfall entry (cut-the-curve §6): binary opacity, rise from below, power4.out
-        function arrive(el, t, dy, dur = 0.2, ease = "power4.out") {
-          gsap.set(el, { opacity: 0 });
-          tl.set(el, { opacity: 1 }, t);
-          tl.fromTo(el, { y: dy }, { y: 0, duration: dur, ease, immediateRender: false }, t);
-        }
         // cut-the-curve exit to the LEFT (the film's current), ending exactly on the cut
         function exitLeft(el, cut, dist = 230) {
           tl.to(el, { x: -dist, duration: 0.34, ease: "power4.in" }, cut - 0.34);
@@ -693,6 +624,35 @@
         function enterLeft(el, cut, dist = 230, dur = 0.36) {
           tl.fromTo(el, { x: dist }, { x: 0, duration: dur, ease: "power4.out" }, cut);
           tl.fromTo(el, { opacity: 0.35 }, { opacity: 1, duration: 0.2, ease: "none" }, cut);
+        }
+        // modern kinetic type: each word slides up from behind its own line mask
+        function mask(el) {
+          const m = document.createElement("span");
+          m.className = "mk";
+          el.parentNode.insertBefore(m, el);
+          m.appendChild(el);
+          return el;
+        }
+        function rise(el, t, dur = 0.6) {
+          mask(el);
+          gsap.set(el, { yPercent: 118 });
+          tl.to(el, { yPercent: 0, duration: dur, ease: "expo.out" }, t);
+        }
+        // brand panel wipe: skewed colour bands sweep right-to-left (the current), expo.inOut,
+        // fully covering the frame on the cut so the scene swap happens under cover
+        const wipes = $("#wipes");
+        function panelWipe(cut, colors, D = 0.82, stagger = 0.065) {
+          const bw = 1.7 * W;
+          const n = colors.length;
+          colors.forEach((c, i) => {
+            const b = document.createElement("div");
+            b.className = "band";
+            Object.assign(b.style, { width: bw + "px", background: c, zIndex: String(i + 1) });
+            wipes.appendChild(b);
+            gsap.set(b, { skewX: -14, x: W + 0.2 * W });
+            const start = cut - D / 2 - (n - 1 - i) * stagger;
+            tl.to(b, { x: -bw - 0.2 * W, duration: D, ease: "expo.inOut" }, start);
+          });
         }
         // image placed to cover a window, centred on a focal point
         function coverImg(src, iw, ih, ww, wh, fx = 0.5, fy = 0.5, over = 1.06) {
@@ -739,7 +699,7 @@
           });
         }
         // snare pickup (bar 2, beat 4): ink floods in on the 16ths, then the hat flies to the "e"
-        tl.to(".lg-hatfill", { opacity: 1, duration: BEAT * 0.9, ease: "steps(4)" }, T(2, 3));
+        tl.to(".lg-hatfill", { opacity: 1, duration: BEAT * 0.7, ease: "power2.inOut" }, T(2, 3));
         tl.to(hat, { x: 0, y: 0, scale: 1, duration: T(3) - T(2, 3) - 0.04, ease: "power3.in" }, T(2, 3) + 0.04);
         // landing on the crash: small rebound, no deformation
         tl.to(hat, { y: -3.4, duration: 0.13, ease: "power2.out" }, T(3));
@@ -773,15 +733,15 @@
           },
           T(4, 3)
         );
-        tl.to("#lg-blur", { filter: "blur(18px)", duration: 0.22, ease: "power2.in" }, T(5) - 0.22);
+        tl.to("#lg-blur", { filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, T(5) - 0.2);
         tl.to("#lg-fade", { opacity: 0.15, duration: 0.2, ease: "none" }, T(5) - 0.2);
 
         // ================================================================== 3 CONCEPTO
-        tl.fromTo("#cz-blur", { scale: 0.75, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, T(5));
+        tl.fromTo("#cz-blur", { scale: 0.8, filter: "blur(6px)" }, { scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, T(5));
         tl.fromTo("#cz-op", { opacity: 0.15 }, { opacity: 1, duration: 0.5, ease: "expo.out" }, T(5));
-        const headFont = parseFloat(getComputedStyle($("#c-head")).fontSize);
         $$("#c-head .w").forEach((w, i) => {
-          if (i > 0) arrive(w, T(5) + i * E8, headFont * 0.42, i === 4 ? 0.22 : 0.18);
+          if (i > 0) rise(w, T(5) + i * E8, 0.6);
+          else mask(w);
         });
         // nudge curve (slow-fast-slow) lifts the headline to make room; burst lands on bar 6
         const lift = -(P ? 0.1 : 0.115) * H;
@@ -794,16 +754,16 @@
         const kws = $$("#c-kw .kw");
         const dots = $$("#c-kw .dot");
         const kwTimes = [T(6, 0), T(6, 1), T(6, 2), T(6, 3), T(7, 0), T(7, 1)];
-        const kwFont = parseFloat(getComputedStyle($("#c-kw")).fontSize);
         kws.forEach((el, i) => {
-          arrive(el, kwTimes[i], kwFont * 0.9, 0.2);
-          if (i > 0) arrive(dots[i - 1], kwTimes[i], kwFont * 0.5, 0.14);
+          rise(el, kwTimes[i], 0.55);
+          if (i > 0) rise(dots[i - 1], kwTimes[i] - 0.04, 0.45);
         });
         const swash = $("#c-swash");
         const swL = swash.getTotalLength();
         gsap.set(swash, { strokeDasharray: swL + " " + swL, strokeDashoffset: swL });
         tl.to(swash, { strokeDashoffset: 0, duration: 0.45, ease: "power2.out" }, T(7, 2));
         exitLeft("#cz-inner", T(8));
+        panelWipe(T(8), ["#FEA300", "#E3D8C5", "#F7F4ED"]);
 
         // ================================================================== 4 PALETA
         const palIn = $("#pal-in");
@@ -815,7 +775,6 @@
           ["black", "#000000", [75.9, 44.5, 24.1, 55.5], "#F7F4ED", "br", T(8, 3)],
           ["cream", "#F7F4ED", [30.3, 44.5, 45.6, 55.5], "#000000", "tc", T(9, 0)],
         ];
-        const HEXCH = "0123456789ABCDEF";
         SW.forEach(([id, col, r, lc, anchor, t], si) => {
           const d = document.createElement("div");
           d.className = "sw";
@@ -836,66 +795,38 @@
           if (anchor === "bl") Object.assign(hex.style, { bottom: P ? "9%" : "13%", left: pad });
           if (anchor === "br") Object.assign(hex.style, { bottom: P ? "9%" : "13%", right: pad });
           const code = col.toUpperCase();
-          const reels = [];
+          const chars = [];
           for (const ch of code) {
-            if (ch === "#") {
-              const s = document.createElement("span");
-              s.textContent = "#";
-              hex.appendChild(s);
-              continue;
-            }
-            const reel = document.createElement("span");
-            reel.className = "reel";
-            const colEl = document.createElement("span");
-            colEl.className = "col";
-            colEl.setAttribute("data-layout-allow-overflow", "");
-            const n = 6;
-            for (let j = 0; j < n - 1; j++) {
-              const s = document.createElement("span");
-              s.textContent = HEXCH[Math.floor(rand() * 16)];
-              colEl.appendChild(s);
-            }
-            const last = document.createElement("span");
-            last.textContent = ch;
-            colEl.appendChild(last);
-            reel.appendChild(colEl);
-            hex.appendChild(reel);
-            reels.push([colEl, n]);
+            const sp = document.createElement("span");
+            sp.style.display = "inline-block";
+            sp.textContent = ch;
+            hex.appendChild(sp);
+            chars.push(sp);
           }
           d.appendChild(hex);
           palIn.appendChild(d);
           // card lands flush on its beat; the first one is the scene's cut-the-curve entry
           gsap.set(d, { opacity: 0 });
-          if (si === 0) {
-            tl.set(d, { opacity: 1 }, t);
-            enterLeft(d, t);
-          } else {
+          {
             tl.set(d, { opacity: 1 }, t);
             tl.fromTo(
               d,
-              { x: 0.16 * W, scale: 1.035, boxShadow: "0 30px 60px rgba(0,0,0,0.28)" },
-              { x: 0, scale: 1, boxShadow: "0 0px 0px rgba(0,0,0,0)", duration: 0.42, ease: "power4.out", immediateRender: false },
+              { x: 0.16 * W, clipPath: "inset(0% 0% 0% 100%)" },
+              { x: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "expo.out", immediateRender: false },
               t
             );
           }
-          // hex code rolls like a split-flap and locks, 16th-staggered per character
-          reels.forEach(([c, n], j) => {
-            tl.fromTo(
-              c,
-              { yPercent: 0 },
-              { yPercent: (-100 * (n - 1)) / n, duration: 0.5, ease: "power3.out", immediateRender: false },
-              t + 0.08 + j * (E16 / 2)
-            );
-          });
+          // hex code slides up out of its mask, 32nd-staggered per character
+          chars.forEach((c, j) => rise(c, t + 0.1 + j * (E16 / 2), 0.5));
         });
         // carrier: the orange swatch grows to full frame and becomes the typography ground
         const OR = SW[0][2];
         tl.to("#sw-orange .hex", { opacity: 0, duration: 0.15, ease: "none" }, T(9, 2.5) - 0.15);
         tl.set("#pal-expand", { opacity: 1, clipPath: `inset(${OR[1]}% 0% ${100 - OR[1] - OR[3]}% ${OR[0]}%)` }, T(9, 2.5));
-        tl.to("#pal-expand", { clipPath: "inset(0% 0% 0% 0%)", duration: T(10) - T(9, 2.5), ease: "power3.in" }, T(9, 2.5));
+        tl.to("#pal-expand", { clipPath: "inset(0% 0% 0% 0%)", duration: T(10) - T(9, 2.5), ease: "expo.in" }, T(9, 2.5));
 
         // ================================================================== 5 TIPOGRAFÍA
-        tl.fromTo("#ty-blur", { scale: 0.86, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, T(10));
+        tl.fromTo("#ty-blur", { scale: 0.86, filter: "blur(4px)" }, { scale: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" }, T(10));
         tl.fromTo("#ty-op", { opacity: 0.15 }, { opacity: 1, duration: 0.45, ease: "expo.out" }, T(10));
         tl.fromTo("#ty-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.out", immediateRender: true }, T(10, 0.5));
         // persiana: each line opens like a slat, one per 8th
@@ -909,6 +840,7 @@
           );
         });
         exitLeft("#ty-inner", T(11));
+        panelWipe(T(11), ["#072305", "#F7F4ED", "#072305"]);
 
         // ================================================================== 6a PATRÓN GORROS
         const hatTileW = P ? 250 : 300;
@@ -990,7 +922,7 @@
         gsap.set("#gz-zoom", { transformOrigin: `${emp2Center[0]}px ${emp2Center[1]}px` });
         const gz0 = T(13, 3) + 0.08;
         tl.to("#gz-zoom", { keyframes: [{ scale: 1.8, duration: (T(14) - gz0) * 0.55, ease: "power2.in" }, { scale: 9, duration: (T(14) - gz0) * 0.45, ease: "power3.in" }] }, gz0);
-        tl.to("#gz-blur", { filter: "blur(18px)", duration: 0.22, ease: "power2.in" }, T(14) - 0.22);
+        tl.to("#gz-blur", { filter: "blur(6px)", duration: 0.2, ease: "power2.in" }, T(14) - 0.2);
         tl.to("#gz-fade", { opacity: 0.15, duration: 0.2, ease: "none" }, T(14) - 0.2);
 
         // ================================================================== 7 COMIDA
@@ -1044,6 +976,7 @@
           const [src, iw, ih] = IMG[key];
           const cw = P ? 0.86 * W : 0.47 * W;
           const chh = (cw * ih) / iw;
+          shot.style.background = "var(--green)";
           const card = document.createElement("div");
           card.className = "card";
           const cx = P ? W / 2 : 0.6 * W;
@@ -1065,27 +998,36 @@
         F.push(shotFull("empanadas", 0.55, 0.55));
         F.push(shotFull("pizza", 0.62, 0.55));
         F.push(shotFull("relleno", 0.45, 0.55));
-        F.push(shotCard("canelones", -2.5));
+        F.push(shotCard("canelones", 0));
         F.push(shotPanels([["empanadas", 0.6, 0.5], ["pizza", 0.62, 0.62]]));
         F.push(shotPanels([["relleno", 0.42, 0.55], ["pizza", 0.6, 0.72], ["empanadas", 0.5, 0.5]]));
         F.push(shotFull("pizza", 0.62, 0.82));
         F.push(shotFull("empanadas", 0.4, 0.45));
-        // hard cuts on beats 1 and 3 (kick) — one per half bar
+        // masked reveals on beats 1 and 3 (kick): the fastest point of each expo wipe lands on the golpe
+        const RV = 0.44;
+        const CIRCLE = { 1: "62% 55%", 6: "62% 78%" }; // punch-ins open as an iris
         F.forEach((f, i) => {
-          tl.set(f.shot, { opacity: 1 }, cuts[i]);
-          if (i < F.length - 1) tl.set(f.shot, { opacity: 0 }, cuts[i + 1]);
+          const t0 = i === 0 ? cuts[0] : cuts[i] - RV / 2;
+          tl.set(f.shot, { opacity: 1 }, t0);
+          if (i > 0) {
+            const from = CIRCLE[i] ? `circle(0% at ${CIRCLE[i]})` : "inset(0% 0% 0% 100%)";
+            const to = CIRCLE[i] ? `circle(120% at ${CIRCLE[i]})` : "inset(0% 0% 0% 0%)";
+            tl.fromTo(f.shot, { clipPath: from }, { clipPath: to, duration: RV, ease: "expo.inOut", immediateRender: false }, t0);
+          }
+          if (i < F.length - 1) tl.set(f.shot, { opacity: 0 }, cuts[i + 1] + RV / 2);
         });
         const drift = 0.025 * W;
         // F1: grows in out of the zoom-through, then a slow push + leftward pan
-        tl.fromTo("#fd-blur", { scale: 0.94, filter: "blur(18px)" }, { scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, T(14));
-        tl.fromTo("#fd-op", { opacity: 0.15 }, { opacity: 1, duration: 0.5, ease: "expo.out" }, T(14));
+        // the empanada cell keeps growing into a rounded card that opens to full frame
+        tl.fromTo("#fd-blur", { scale: 0.9, clipPath: "inset(22% 30% 22% 30% round 48px)" }, { scale: 1, clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 0.7, ease: "expo.out" }, T(14));
+        tl.fromTo("#fd-op", { opacity: 0.4 }, { opacity: 1, duration: 0.25, ease: "none" }, T(14));
         tl.fromTo(F[0].kb, { x: drift, scale: 1 }, { x: -drift, scale: 1.05, duration: HB, ease: "none" }, cuts[0]);
         // F2: punch-in on the cut, then the pan keeps the current
         tl.fromTo(F[1].kb, { scale: 1.16, x: drift }, { scale: 1.05, duration: 0.32, ease: "power4.out" }, cuts[1]);
         tl.to(F[1].kb, { x: -drift, duration: HB, ease: "none" }, cuts[1]);
         tl.fromTo(F[2].kb, { x: drift, scale: 1.02 }, { x: -drift, scale: 1.08, duration: HB, ease: "none" }, cuts[2]);
         // F4: framed canelones (small source) slides in on the current
-        tl.fromTo(F[3].card, { x: 0.14 * W, rotationY: -14 }, { x: 0, rotationY: 0, duration: 0.45, ease: "power4.out" }, cuts[3]);
+        tl.fromTo(F[3].card, { x: 0.12 * W, scale: 1.08 }, { x: 0, scale: 1, duration: 0.7, ease: "expo.out" }, cuts[3] - RV / 2);
         tl.to(F[3].card, { x: -0.02 * W, duration: HB - 0.45, ease: "none" }, cuts[3] + 0.45);
         // F5 / F6: panels snap in from the right on the 8ths
         [F[4], F[5]].forEach((f, j) => {
@@ -1093,28 +1035,25 @@
           f.panels.forEach((p, i) => {
             tl.fromTo(p.kb, { x: drift * 0.8, scale: 1.04 }, { x: -drift * 0.8, scale: 1.06, duration: HB, ease: "none" }, t0);
             if (i > 0) {
-              gsap.set(p.win, { opacity: 0 });
-              tl.set(p.win, { opacity: 1 }, t0 + i * E8);
-              tl.fromTo(p.win, P ? { x: W * 0.5 } : { x: (W / f.panels.length) * 0.9 }, { x: 0, duration: 0.3, ease: "power4.out", immediateRender: false }, t0 + i * E8);
+              const from = P ? "inset(0% 0% 0% 100%)" : "inset(0% 0% 0% 100%)";
+              tl.fromTo(p.win, { clipPath: from }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.4, ease: "expo.out", immediateRender: true }, t0 + i * E8);
             }
           });
         });
         // F7: hard punch on the cheese pull
         tl.fromTo(F[6].kb, { scale: 1.22, x: drift }, { scale: 1.07, duration: 0.3, ease: "power4.out" }, cuts[6]);
         tl.to(F[6].kb, { x: -drift, duration: HB, ease: "none" }, cuts[6]);
-        // F8: push that accelerates into the whip
+        // F8: push that accelerates into the panel wipe
         tl.fromTo(F[7].kb, { x: drift, scale: 1.03 }, { x: -drift, scale: 1.09, duration: HB, ease: "power1.in" }, cuts[7]);
         // overlay copy rides across the cuts (carrier) — one word per 8th
         tl.to("#fd-scrim", { opacity: 1, duration: 0.4, ease: "power2.out" }, T(14, 1) - 0.1);
-        const fdFont = parseFloat(getComputedStyle($("#fd-text")).fontSize);
         const fdw = $$("#fd-text .w");
         const fdTimes = [T(14, 1), T(14, 1.5), T(14, 2), T(15, 1), T(15, 1.5), T(15, 2)];
-        fdw.forEach((w, i) => arrive(w, fdTimes[i], fdFont * 0.5, i === 5 ? 0.22 : 0.18));
+        fdw.forEach((w, i) => rise(w, fdTimes[i], 0.6));
         // WHIP to the LEFT into the applications world (directional blur, matched speed)
-        tl.to("#fd-whip", { x: -0.32 * W, duration: 0.3, ease: "power4.in" }, T(18) - 0.3);
-        gsap.set("#fd-whip", { filter: "url(#whip-out)" });
-        tl.fromTo("#whip-out-blur", { attr: { stdDeviation: "0 0" } }, { attr: { stdDeviation: "46 0" }, duration: 0.3, ease: "power3.in" }, T(18) - 0.3);
-        tl.to("#fd-whip", { opacity: 0, duration: 0.18, ease: "none" }, T(18) - 0.2);
+        // brand panel wipe into the applications world; content keeps moving left under it
+        tl.to("#fd-whip", { x: -0.25 * W, duration: 0.42, ease: "expo.in" }, T(18) - 0.42);
+        panelWipe(T(18), ["#FEA300", "#072305", "#E3D8C5"]);
 
         // ================================================================== 8 APLICACIONES (2.5D world)
         const world = $("#world");
@@ -1160,25 +1099,20 @@
           tl.to(world, { x: stops[i].x, y: stops[i].y, z: stops[i].z, duration: dur, ease: "power3.inOut" }, stopT[i] - dur);
         }
         tl.fromTo("#ap-drift", { x: 0.02 * W }, { x: -0.03 * W, duration: T(21) - T(18), ease: "none" }, T(18));
-        // whip entry from the right with matched directional blur
-        tl.fromTo("#ap-in", { x: 0.32 * W }, { x: 0, duration: 0.36, ease: "power4.out" }, T(18));
-        gsap.set("#ap-in", { filter: "url(#whip-in)" });
-        tl.fromTo("#whip-in-blur", { attr: { stdDeviation: "46 0" } }, { attr: { stdDeviation: "0 0" }, duration: 0.36, ease: "power3.out" }, T(18));
-        tl.fromTo("#ap-op", { opacity: 0.35 }, { opacity: 1, duration: 0.2, ease: "none" }, T(18));
-        // INVERSE ZOOM exit (Z pull): the apron logo recedes, the final logo will arrive
-        tl.to("#ap-pull", { scale: 0.8, filter: "blur(10px)", duration: 0.24, ease: "power3.in" }, T(21) - 0.24);
-        tl.to("#ap-op", { opacity: 0.15, duration: 0.2, ease: "none" }, T(21) - 0.2);
+        // the world slides in from the right under the panel wipe
+        tl.fromTo("#ap-in", { x: 0.25 * W }, { x: 0, duration: 0.6, ease: "expo.out" }, T(18));
+        // green iris opens from the apron's logo (dead centre) and becomes the closing ground
+        tl.to("#ap-pull", { scale: 0.86, duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
+        tl.to("#ap-iris", { clipPath: "circle(80% at 50% 50%)", duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
 
         // ================================================================== 9 CIERRE
-        tl.fromTo("#cl-blur", { scale: 1.25, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.62, ease: "expo.out" }, T(21));
-        tl.fromTo("#cl-op", { opacity: 0.15 }, { opacity: 1, duration: 0.5, ease: "expo.out" }, T(21));
-        const clSvg = $("#cl-svg");
+        tl.fromTo("#cl-blur", { scale: 1.22, filter: "blur(4px)" }, { scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, T(21));
+        tl.fromTo("#cl-op", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "none" }, T(21));
         const clW = (P ? 0.8 : 0.51) * W;
         const clH = clW * (119.929 / 287.396);
         $("#cl-tag").style.top = H / 2 + clH / 2 + (P ? 0.03 : 0.055) * H + "px";
-        const tagFont = parseFloat(getComputedStyle($("#cl-tag .main")).fontSize);
-        $$("#cl-tag .w").forEach((w, i) => arrive(w, T(21, 1) + i * E8, tagFont * 0.6, 0.2));
-        arrive("#cl-sub", T(21, 2.5), 16, 0.3);
+        $$("#cl-tag .w").forEach((w, i) => rise(w, T(21, 1) + i * E8, 0.6));
+        rise($("#cl-sub"), T(21, 2.5), 0.6);
         // band pickup on beat 4 / 4&: the mark gathers, then the last golpe releases it
         [T(21, 3), T(21, 3.5)].forEach((t) => {
           tl.to("#cl-pulse", { scale: 0.975, duration: 0.07, ease: "power2.out" }, t);
