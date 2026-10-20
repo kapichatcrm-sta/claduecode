@@ -7,10 +7,12 @@ mockup rendered at its native resolution.
 Usage: python3 -I tools/extract_assets.py <manual.pdf>
 """
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 import pymupdf as fitz
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 A = ROOT / "assets"
@@ -79,7 +81,6 @@ for x in pdf[0].get_fonts(full=True):
 Z = 1418 / PW
 CLIPS = {
     "swatches": (2, (0, 0, PW, PH)),
-    "pattern-greek": (5, (0, 0, PW, PH)),
     "roll-greek": (6, (0, 0, PW, 354)),
     "roll-masks": (6, (0, 355, PW, PH)),
     "sign": (8, (0, 0, PW, PH)),
@@ -90,16 +91,22 @@ CLIPS = {
     "cards-wood": (14, (0, 0, PW, 284)),
     "frame-masks": (14, (0, 284, PW, 567)),
     "fabric-card": (15, (0, 0, 381, PH)),
-    "cup": (17, (255, 0, PW, PH)),
     "roll-light": (17, (0, 0, 255, PH)),
     "frame-palm": (18, (0, 0, PW, PH)),
     "card-patterns": (19, (0, 0, PW, PH)),
-    "wall-stickers": (4, (0, 0, PW, PH)),
 }
 for name, (pn, r) in CLIPS.items():
     pix = pdf[pn - 1].get_pixmap(matrix=fitz.Matrix(Z, Z), clip=fitz.Rect(*r), alpha=False)
-    pix.save(str(A / f"img/{name}.jpg"), jpg_quality=93)
+    # 1:1 with the embedded images; saved once at high quality with full chroma (no 4:2:0)
+    Image.frombytes("RGB", (pix.width, pix.height), pix.samples).save(A / f"img/{name}.jpg", quality=96, subsampling=0)
     print(f"img {name}: {pix.width}x{pix.height}")
+
+# the greek pattern is flat artwork: separate its inks and upscale 2x with clean edges
+pix = pdf[4].get_pixmap(matrix=fitz.Matrix(Z, Z), alpha=False)
+native = A / "img/pattern-greek-native.png"
+Image.frombytes("RGB", (pix.width, pix.height), pix.samples).save(native)
+subprocess.run([sys.executable, "-I", str(ROOT / "tools/flat_upscale.py"), str(native), str(A / "img/pattern-greek@2x.png"), "2", "6"], check=True)
+native.unlink()
 
 # ---------------------------------------------------------------- seamless tile of the vase pattern (page 3)
 # the vases repeat every 70.866 pt across and 99.213 pt down; any interior window of that size tiles

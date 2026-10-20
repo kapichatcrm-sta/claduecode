@@ -384,9 +384,13 @@
           const sh = bh / n;
           for (let k = 0; k < n; k++) {
             const s = place(el("div", "box", parent, { boxShadow: "none" }), bx, by + k * sh, bw, sh + 1);
+            // the window's rounded corners live on its first and last slat
+            if (!P && k === 0) s.style.borderRadius = "18px 18px 0 0";
+            if (!P && k === n - 1) s.style.borderRadius = "0 0 18px 18px";
             const i = img(src, s, iw, ih, bw, bh, fx, fy, 1.06);
             i.style.top = px(parseFloat(i.style.top) - k * sh);
-            tl.fromTo(s, { x: bw + W * 0.05 }, { x: 0, duration: 0.62, ease: "expo.inOut" }, t - 0.31 + k * 0.035);
+            // slats wait fully outside the frame, then sweep in
+            tl.fromTo(s, { x: W - bx + 0.02 * W }, { x: 0, duration: 0.7, ease: "expo.inOut" }, t - 0.35 + k * 0.035);
             tl.fromTo(i, { x: -bw * 0.18 }, { x: 0, duration: 0.9, ease: "expo.out" }, t - 0.05 + k * 0.035);
           }
         }
@@ -675,13 +679,23 @@
         // B: greek motifs (manual page 5)
         const bB = el("div", "band", bands);
         const gB = el("div", "fill", bB);
-        const gImg = img("assets/img/pattern-greek.jpg", gB, 1418, 1970, W, H * 1.25, 0.5, 0.5, 1.0);
+        // 2x ink-separated upscale of page 5: displayed at <= 1:1, so it stays crisp full-frame
+        img("assets/img/pattern-greek@2x.png", gB, 2836, 3940, W, H * 1.25, 0.5, 0.5, 1.0);
         BANDS.push([bB, gB]);
-        // C: masks wallpaper
-        const bC = el("div", "band", bands);
+        // C: the brand's vector motifs set in a brick repeat on sand (crisp at any size)
+        const bC = el("div", "band", bands, { background: C.sand });
         const mC = el("div", "fill", bC);
-        // keep to the wallpaper above the furniture line of the room photo
-        img("assets/img/wall-masks.jpg", mC, 1418, 984, W, H * 1.2, 0.5, 0.0, P ? 1.7 : 1.15);
+        const REP = ["palmette", "bust", "fan", "helmet", "venus", "cup"];
+        const cell = P ? 150 : 170;
+        const cols = Math.ceil((W * 1.6) / cell) + 1;
+        const rows = Math.ceil((H * 1.6) / cell) + 1;
+        for (let r = 0; r < rows; r++) {
+          for (let q = 0; q < cols; q++) {
+            const name = REP[(r * 2 + q) % REP.length];
+            motif(name, mC, -0.3 * W + q * cell + (r % 2 ? cell / 2 : 0), -0.3 * H + r * cell, cell * 0.6, cell * 0.62);
+          }
+        }
+        mC.setAttribute("data-layout-allow-overflow", "");
         BANDS.push([bC, mC]);
         const pd = T(17) - T(12, 2);
         BANDS.forEach(([b, inner], i) => {
@@ -694,14 +708,16 @@
         tl.to(bB, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
         tl.to(bA, { ...(P ? { y: -H / 3 } : { x: -W / 3 }), duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
         tl.to(bC, { ...(P ? { y: H / 3 } : { x: W / 3 }), duration: 0.8, ease: "expo.inOut" }, T(14) - 0.4);
-        // bar 14 beat 3: MATCH CUT — the flat pattern becomes the sheet coming out of the printer
+        // bar 14 beat 3: from pattern to print — the printer photo opens in a window over the pattern.
+        // Photos are 1418 px wide: the window keeps them at or below 1:1 (never stretched).
         const photo = $("#pt-photo");
-        const PB = P ? [0, 0.25 * H, W, 0.5 * H] : [0, 0, W, H];
-        const pr = place(el("div", "box", photo, { boxShadow: P ? "0 40px 80px rgba(0,0,0,0.25)" : "none" }), ...PB);
+        const pwW = P ? W : 0.68 * W;
+        const pwH = P ? 0.5 * H : (pwW * 987) / 1418;
+        const PB = [(W - pwW) / 2, (H - pwH) / 2, pwW, pwH];
+        const pr = place(el("div", "box", photo, { boxShadow: "0 50px 100px rgba(0,0,0,0.3)", borderRadius: P ? "0px" : "18px" }), ...PB);
         const prImg = img("assets/img/printer-greek.jpg", pr, 1418, 987, PB[2], PB[3], 0.5, 0.5, 1.02);
-        gsap.set(pr, { opacity: 0 });
-        tl.set(pr, { opacity: 1 }, T(14, 2));
-        tl.fromTo(prImg, { scale: 2.1, transformOrigin: "62% 72%" }, { scale: 1, duration: 1.1, ease: "expo.out" }, T(14, 2));
+        tl.fromTo(pr, { clipPath: "inset(48% 48% 48% 48% round 18px)" }, { clipPath: "inset(0% 0% 0% 0% round 18px)", duration: 0.9, ease: "expo.out", immediateRender: true }, T(14, 2) - 0.12);
+        tl.fromTo(prImg, { scale: 1.08 }, { scale: 1, duration: 1.4, ease: "expo.out" }, T(14, 2) - 0.12);
         // bars 15-16: photos arrive in slats, one every two beats
         const SLATS = [
           ["printer-masks", 1418, 984, 0.5, 0.55, T(15)],
