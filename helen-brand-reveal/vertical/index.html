@@ -1053,8 +1053,8 @@
 
         // ================================================================== 8 APLICACIONES (bento wall)
         // BENTO WALL: columns of rounded mockups drift in opposite directions (parallax) on a
-        // table-top plane that straightens up; tiles open on the 16ths, then the camera flies into
-        // the shop window and its logo opens the closing iris.
+        // table-top plane that straightens up; tiles open on the 32nds, then the camera flies into
+        // the wall sign and its logo opens the closing iris.
         const MOCK = {
           "cartel-b": [1419, 1971, 0.505, 0.465],
           vidriera: [1419, 1971, 0.462, 0.423],
@@ -1067,11 +1067,11 @@
         // columns long enough to cover the frame for the whole scroll (and in 9:16)
         const COLS = [
           ["menu", "laptop", "bolsa-kraft", "cartel-b", "caja-pizza", "delantal", "vidriera", "menu"],
-          ["laptop", "delantal", "caja-pizza", "vidriera", "bolsa-kraft", "cartel-b", "menu", "laptop"],
+          ["laptop", "delantal", "caja-pizza", "cartel-b", "bolsa-kraft", "vidriera", "menu", "laptop"],
           ["cartel-b", "caja-pizza", "menu", "delantal", "laptop", "bolsa-kraft", "vidriera", "caja-pizza"],
           ["bolsa-kraft", "delantal", "vidriera", "caja-pizza", "menu", "cartel-b", "laptop", "delantal"],
         ].slice(0, P ? 3 : 4);
-        const TCOL = 1; // the column holding the hero shop window
+        const TCOL = 1; // the column holding the hero wall sign
         const TIDX = 3;
         const TWD = P ? 300 : 380;
         const GAP = P ? 20 : 26;
@@ -1104,7 +1104,7 @@
           bento.appendChild(col);
         });
         const cols = $$(".bcol", bento);
-        // the hero column decelerates so the shop-window logo parks dead centre for the fly-in
+        // the hero column decelerates so the wall-sign logo parks dead centre for the fly-in
         const heroLogoY = hero.top + hero.ly * hero.h;
         const heroEndY = H / 2 - heroLogoY;
         const parkT = T(20);
@@ -1133,18 +1133,20 @@
           });
         // camera with intent: the table-top plane straightens while the wall builds
         tl.fromTo(bento, { rotationX: 26, rotationZ: -7, scale: 0.9 }, { rotationX: 0, rotationZ: 0, scale: 1, duration: parkT - T(18), ease: "power2.inOut" }, T(18));
-        // fly into the shop window until it fills the frame, landing on bar 20 beat 3
+        // fly into the wall sign, landing on bar 20 beat 3
         const heroX = x0 + TCOL * (TWD + GAP) + hero.lx * TWD;
-        // scale so the shop window covers the frame on every side of its (centred) logo
-        const fillS =
-          1.04 *
-          Math.max(W / 2 / (hero.lx * TWD), W / 2 / ((1 - hero.lx) * TWD), H / 2 / (hero.ly * hero.h), H / 2 / ((1 - hero.ly) * hero.h));
+        // 16:9: the wall sign covers the frame around its (centred) logo.
+        // 9:16: the whole photo fits inside the frame, no edge is cropped.
+        const fillS = P
+          ? 0.92 * Math.min(W / TWD, H / hero.h)
+          : 1.04 *
+            Math.max(W / 2 / (hero.lx * TWD), W / 2 / ((1 - hero.lx) * TWD), H / 2 / (hero.ly * hero.h), H / 2 / ((1 - hero.ly) * hero.h));
         gsap.set("#ap-zoom", { transformOrigin: `${heroX}px ${H / 2}px` });
         tl.to("#ap-zoom", { x: W / 2 - heroX, scale: fillS, duration: T(20, 2) - parkT, ease: "expo.inOut" }, parkT);
         tl.to("#ap-zoom", { scale: fillS * 1.06, duration: T(21) - T(20, 2), ease: "none" }, T(20, 2));
         // the wall slides in from the right under the panel wipe
         tl.fromTo("#ap-in", { x: 0.25 * W }, { x: 0, duration: 0.6, ease: "expo.out" }, T(18));
-        // green iris opens from the shop-window logo (dead centre) and becomes the closing ground
+        // green iris opens from the wall-sign logo (dead centre) and becomes the closing ground
         tl.to("#ap-pull", { scale: 1.12, duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
         tl.to("#ap-iris", { clipPath: "circle(80% at 50% 50%)", duration: 0.5, ease: "expo.in" }, T(21) - 0.5);
 
